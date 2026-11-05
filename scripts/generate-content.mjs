@@ -35,16 +35,31 @@ async function loadEntries(directory) {
 
 for (const collection of ["projects", "work"]) {
   const entries = await loadEntries(collection);
-  entries.sort((first, second) =>
-    collection === "projects"
-      ? String(first.number).localeCompare(String(second.number), undefined, {
-          numeric: true,
-        })
-      : Number(first.order ?? Number.POSITIVE_INFINITY) -
-        Number(second.order ?? Number.POSITIVE_INFINITY),
-  );
+  entries.sort((first, second) => {
+    if (collection === "projects") return first.slug.localeCompare(second.slug);
+    const firstOrder = Number(first.order);
+    const secondOrder = Number(second.order);
+    if (Number.isFinite(firstOrder) && Number.isFinite(secondOrder)) {
+      return firstOrder - secondOrder || first.slug.localeCompare(second.slug);
+    }
+    if (Number.isFinite(firstOrder)) return -1;
+    if (Number.isFinite(secondOrder)) return 1;
+    return first.slug.localeCompare(second.slug);
+  });
+  const normalizedEntries = entries.map((entry, index) => {
+    if (collection === "projects") {
+      const images = Array.isArray(entry.images)
+        ? entry.images.filter((image) => typeof image === "string" && image)
+        : [];
+      return { ...entry, number: String(index + 1).padStart(2, "0"), images };
+    }
+    const media = Array.isArray(entry.media)
+      ? entry.media.filter((file) => typeof file === "string" && file)
+      : [];
+    return { ...entry, media };
+  });
   await writeFile(
     resolve("public/content", `${collection}-index.json`),
-    `${JSON.stringify({ [collection]: entries }, null, 2)}\n`,
+    `${JSON.stringify({ [collection]: normalizedEntries }, null, 2)}\n`,
   );
 }

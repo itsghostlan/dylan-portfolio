@@ -705,7 +705,13 @@ footer {
   transform: translateY(-4px);
 }
 
-.work-card img {
+.work-card-media {
+  display: grid;
+  gap: 8px;
+}
+
+.work-card img,
+.work-card video {
   display: block;
   width: 100%;
   aspect-ratio: 4 / 5;
@@ -714,19 +720,22 @@ footer {
   transition: filter 200ms ease;
 }
 
-.work-card:nth-child(3n + 2) img {
+.work-card:nth-child(3n + 2) img,
+.work-card:nth-child(3n + 2) video {
   aspect-ratio: 1 / 1;
 }
 
-.work-card:nth-child(4n) img {
+.work-card:nth-child(4n) img,
+.work-card:nth-child(4n) video {
   aspect-ratio: 3 / 4;
 }
 
-.work-card:hover img {
+.work-card:hover img,
+.work-card:hover video {
   filter: saturate(1.05);
 }
 
-.work-card > div {
+.work-card > div:last-child {
   display: flex;
   gap: 10px;
   align-items: baseline;

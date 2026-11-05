@@ -49,18 +49,19 @@ collections:
     extension: json
     format: json
     slug: "{{slug}}"
-    summary: "{{number}} — {{title}}"
+    summary: "{{title}} — {{year}}"
     fields:
-      - { label: URL Slug, name: slug, widget: string, required: false }
-      - { label: Display Number, name: number, widget: string, required: false }
       - { label: Project Name, name: title, widget: string, required: false }
       - { label: Category, name: type, widget: string, required: false }
       - { label: Year, name: year, widget: string, required: false }
       - { label: Role, name: role, widget: string, required: false }
       - { label: Client, name: client, widget: string, required: false }
       - { label: Featured on Home, name: featured, widget: boolean, default: false, required: false }
-      - { label: Thumbnail, name: image, widget: string, required: false }
-      - { label: Image Alt Text, name: alt, widget: string, required: false }
+      - label: Images
+        name: images
+        widget: list
+        required: false
+        field: { label: Image, name: image, widget: image, required: false }
       - label: Tags
         name: tags
         widget: list
@@ -81,19 +82,17 @@ collections:
     slug: "{{slug}}"
     summary: "{{title}} — {{year}}"
     fields:
-      - { label: URL Slug, name: slug, widget: string, required: false }
-      - label: Linked Project
-        name: projectSlug
-        widget: relation
-        collection: projects
-        search_fields: [title]
-        value_field: slug
-        display_fields: [title]
-        required: false
       - { label: Display Title, name: title, widget: string, required: false }
       - { label: Year, name: year, widget: string, required: false }
-      - { label: Image, name: image, widget: string, required: false }
-      - { label: Image Alt Text, name: alt, widget: string, required: false }
+      - label: Media
+        name: media
+        widget: list
+        required: false
+        field:
+          label: Image or Video
+          name: file
+          widget: file
+          required: false
       - { label: Display Order, name: order, widget: number, value_type: int, min: 1, required: false }
 
   - name: posts

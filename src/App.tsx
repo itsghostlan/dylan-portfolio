@@ -39,8 +39,7 @@ type Project = {
   type: string
   year: string
   featured: boolean
-  image: string
-  alt: string
+  images: string[]
   role?: string
   client?: string
   tags?: string[]
@@ -49,11 +48,9 @@ type Project = {
 
 type WorkItem = {
   slug: string
-  projectSlug: string
   title: string
   year: string
-  image: string
-  alt: string
+  media: string[]
   order?: number | null
 }
 
@@ -115,6 +112,34 @@ function contentOrEmpty(value: string): string {
   return value.trim() || "No content yet."
 }
 
+function isVideoFile(source: string): boolean {
+  const pathname = source.split(/[?#]/, 1)[0].toLowerCase()
+  return /\.(mp4|webm|mov|m4v|ogv)$/.test(pathname)
+}
+
+function MediaPreview({
+  source,
+  alt,
+  className,
+}: {
+  source: string
+  alt: string
+  className?: string
+}) {
+  return isVideoFile(source) ? (
+    <video
+      className={className}
+      src={source}
+      aria-label={alt}
+      controls
+      playsInline
+      preload="metadata"
+    />
+  ) : (
+    <img className={className} src={source} alt={alt} />
+  )
+}
+
 function asString(value: unknown): string {
   return typeof value === "string" ? value : ""
 }
@@ -146,6 +171,7 @@ function parseSiteSettings(value: unknown): SiteSettings | null {
 
 function parseProject(value: unknown): Project | null {
   if (!isRecord(value)) return null
+  const images = Array.isArray(value.images) ? value.images : []
   const tags = Array.isArray(value.tags) ? value.tags : []
   const deliverables = Array.isArray(value.deliverables)
     ? value.deliverables
@@ -157,8 +183,7 @@ function parseProject(value: unknown): Project | null {
     type: asString(value.type),
     year: asString(value.year),
     featured: value.featured === true,
-    image: asString(value.image),
-    alt: asString(value.alt),
+    images: images.filter((image): image is string => typeof image === "string"),
     role: asString(value.role),
     client: asString(value.client),
     tags: tags.filter((tag): tag is string => typeof tag === "string"),
@@ -170,13 +195,12 @@ function parseProject(value: unknown): Project | null {
 
 function parseWorkItem(value: unknown): WorkItem | null {
   if (!isRecord(value)) return null
+  const media = Array.isArray(value.media) ? value.media : []
   return {
     slug: asString(value.slug),
-    projectSlug: asString(value.projectSlug),
     title: asString(value.title),
     year: asString(value.year),
-    image: asString(value.image),
-    alt: asString(value.alt),
+    media: media.filter((file): file is string => typeof file === "string"),
     order:
       typeof value.order === "number" || value.order === null
         ? value.order
@@ -355,22 +379,16 @@ function ProjectDetailPage({
   settings: SiteSettings
   onBack: () => void
 }) {
-  const projectIndex = projects.findIndex((item) => item.slug === project.slug)
-  const media = [
-    { src: project.image, alt: project.alt },
-    {
-      src: projects[(projectIndex + 1) % projects.length].image,
-      alt: "Supporting project study",
-    },
-    {
-      src: projects[(projectIndex + 2) % projects.length].image,
-      alt: "Additional project detail",
-    },
-  ]
+  const media = project.images.map((source) => ({
+    src: source,
+    alt: project.title || "Project image",
+  }))
+  const displayMedia = media.length > 0 ? media : [{ src: "", alt: "" }]
   const [activeMedia, setActiveMedia] = useState(0)
   const [isLightboxOpen, setIsLightboxOpen] = useState(false)
 
   const moveMedia = (direction: number) => {
+    if (media.length < 2) return
     setActiveMedia(
       (current) => (current + direction + media.length) % media.length,
     )
@@ -403,9 +421,9 @@ function ProjectDetailPage({
         <header className="project-page-header">
           <div>
             <p className="eyebrow">
-              Project {project.number} · {project.type}
+              Project {project.number} · {contentOrEmpty(project.type)}
             </p>
-            <h1>{project.title}</h1>
+            <h1>{contentOrEmpty(project.title)}</h1>
           </div>
           <div className="project-facts">
             <div>
@@ -439,11 +457,11 @@ function ProjectDetailPage({
               onClick={() => setIsLightboxOpen(true)}
               aria-label="Enlarge current image"
             >
-              {media[activeMedia].src ? (
-                <img
-                  key={media[activeMedia].src}
-                  src={media[activeMedia].src}
-                  alt={media[activeMedia].alt}
+              {displayMedia[activeMedia]?.src ? (
+                <MediaPreview
+                  key={displayMedia[activeMedia].src}
+                  source={displayMedia[activeMedia].src}
+                  alt={displayMedia[activeMedia].alt}
                 />
               ) : (
                 <span className="empty-content">No content yet.</span>
@@ -470,7 +488,7 @@ function ProjectDetailPage({
           </div>
           <div className="project-carousel-footer">
             <div className="carousel-thumbnails">
-              {media.map((item, index) => (
+              {displayMedia.map((item, index) => (
                 <button
                   className={activeMedia === index ? "active" : ""}
                   key={item.src}
@@ -541,8 +559,11 @@ function ProjectDetailPage({
           >
             <ChevronLeft aria-hidden="true" />
           </button>
-          {media[activeMedia].src ? (
-            <img src={media[activeMedia].src} alt={media[activeMedia].alt} />
+          {displayMedia[activeMedia]?.src ? (
+            <MediaPreview
+              source={displayMedia[activeMedia].src}
+              alt={displayMedia[activeMedia].alt}
+            />
           ) : (
             <span className="empty-content">No content yet.</span>
           )}
@@ -932,11 +953,11 @@ export default function App() {
                       key={project.slug}
                       onClick={() => openProject(project)}
                     >
-                      {project.image ? (
-                        <img
+                      {project.images[0] ? (
+                        <MediaPreview
                           className="project-thumb"
-                          src={project.image}
-                          alt={project.alt}
+                          source={project.images[0]}
+                          alt={project.title || "Project image"}
                         />
                       ) : (
                         <span className="project-thumb empty-content">
@@ -1024,11 +1045,11 @@ export default function App() {
                     key={project.slug}
                     onClick={() => openProject(project)}
                   >
-                    {project.image ? (
-                      <img
+                    {project.images[0] ? (
+                      <MediaPreview
                         className="project-thumb"
-                        src={project.image}
-                        alt={project.alt}
+                        source={project.images[0]}
+                        alt={project.title || "Project image"}
                       />
                     ) : (
                       <span className="project-thumb empty-content">
@@ -1064,38 +1085,27 @@ export default function App() {
                 {workItems.length === 0 && (
                   <p className="empty-content">No content yet.</p>
                 )}
-                {workItems.map((item) => {
-                  const project = projects.find(
-                    (entry) => entry.slug === item.projectSlug,
-                  )
-                  const cardContent = (
-                    <>
-                      {item.image ? (
-                        <img src={item.image} alt={item.alt} />
+                {workItems.map((item) => (
+                  <article className="work-card" key={item.slug}>
+                    <div className="work-card-media">
+                      {item.media.length > 0 ? (
+                        item.media.map((source) => (
+                          <MediaPreview
+                            key={source}
+                            source={source}
+                            alt={item.title || "Work media"}
+                          />
+                        ))
                       ) : (
                         <span className="empty-content">No content yet.</span>
                       )}
-                      <div>
-                        <strong>{contentOrEmpty(item.title)}</strong>
-                        <span>{contentOrEmpty(item.year)}</span>
-                      </div>
-                    </>
-                  )
-
-                  return project ? (
-                    <button
-                      className="work-card"
-                      key={item.slug}
-                      onClick={() => openProject(project)}
-                    >
-                      {cardContent}
-                    </button>
-                  ) : (
-                    <article className="work-card" key={item.slug}>
-                      {cardContent}
-                    </article>
-                  )
-                })}
+                    </div>
+                    <div>
+                      <strong>{contentOrEmpty(item.title)}</strong>
+                      <span>{contentOrEmpty(item.year)}</span>
+                    </div>
+                  </article>
+                ))}
               </div>
             </div>
           )}
