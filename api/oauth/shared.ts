@@ -2,10 +2,24 @@ const cookieName = "csrf-token";
 const allowedScopes = new Set(["repo", "public_repo", "user", "read:user", "user:email"]);
 
 function getAllowedDomains(): string[] {
-  return (process.env.ALLOWED_DOMAINS ?? "")
+  const configuredDomains = (process.env.ALLOWED_DOMAINS ?? "")
     .split(",")
     .map((domain) => domain.trim().toLowerCase())
     .filter(Boolean);
+  const canonicalDomain = process.env.OAUTH_BASE_URL;
+
+  if (canonicalDomain) {
+    try {
+      const url = new URL(canonicalDomain);
+      if (url.protocol === "https:" && url.pathname === "/" && !url.search && !url.hash) {
+        configuredDomains.push(url.hostname.toLowerCase());
+      }
+    } catch {
+      // Invalid OAuth base URLs are rejected by getClientCredentials.
+    }
+  }
+
+  return [...new Set(configuredDomains)];
 }
 
 function isAllowedDomain(hostname: string): boolean {
@@ -145,7 +159,7 @@ export function auth(request: Request): Response {
   }
 
   const credentials = getClientCredentials();
-  if (!credentials || getAllowedDomains().length === 0) {
+  if (!credentials) {
     return configurationError(request);
   }
 
@@ -207,7 +221,7 @@ export async function callback(request: Request): Promise<Response> {
   }
 
   const credentials = getClientCredentials();
-  if (!credentials || getAllowedDomains().length === 0) {
+  if (!credentials) {
     return configurationError(request);
   }
 

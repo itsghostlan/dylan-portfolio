@@ -25,10 +25,10 @@ The OAuth function reads these **server-only** Vercel environment variables:
 - `GITHUB_CLIENT_ID` — GitHub OAuth App client ID.
 - `GITHUB_CLIENT_SECRET` — GitHub OAuth App secret; add as a Vercel Secret, never to source control.
 - `OAUTH_BASE_URL` — the site's canonical HTTPS origin, e.g. `https://your-project.vercel.app`. Set this for Production and Preview only if Preview sign-in is configured.
-- `ALLOWED_DOMAINS` — comma-separated hostnames allowed to open CMS sign-in, e.g. `your-project.vercel.app,www.example.com`.
+- `ALLOWED_DOMAINS` — optional comma-separated additional hostnames allowed to open CMS sign-in, e.g. `www.example.com`. The hostname in `OAUTH_BASE_URL` is trusted automatically.
 - `SITE_URL` — optional canonical site URL shown in the CMS; otherwise the Vercel production URL is used.
 
-Use the same Production origin for `OAUTH_BASE_URL` and `SITE_URL`. In GitHub Developer Settings, create an OAuth App with its **Authorization callback URL** set to `https://your-project.vercel.app/callback`, then add its client ID and secret in Vercel **Project → Settings → Environment Variables** and redeploy. The Vercel Function handles `/auth` and `/callback`, validates CSRF state, restricts CMS sign-in to `ALLOWED_DOMAINS`, and exchanges the GitHub code server-side.
+Use the same Production origin for `OAUTH_BASE_URL` and `SITE_URL`. In GitHub Developer Settings, create an OAuth App with its **Authorization callback URL** set to `https://your-project.vercel.app/callback`, then add its client ID and secret in Vercel **Project → Settings → Environment Variables** and redeploy. The Vercel Function handles `/auth` and `/callback`, validates CSRF state, restricts CMS sign-in to the canonical `OAUTH_BASE_URL` hostname and any optional `ALLOWED_DOMAINS`, and exchanges the GitHub code server-side.
 
 Vercel CLI can also add environment variables after authenticating with `npx vercel login`; do not commit a populated `.env` file. `.env.example` lists the variable names without secrets.
 
