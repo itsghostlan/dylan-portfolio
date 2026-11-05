@@ -152,6 +152,26 @@ type Project = typeof defaultProjects[number] & {
   deliverables?: string[]
 }
 
+type WorkItem = {
+  slug: string
+  projectSlug: string
+  title: string
+  year: string
+  image: string
+  alt: string
+  order: number
+}
+
+const defaultWork: WorkItem[] = defaultProjects.map((project) => ({
+  slug: project.slug,
+  projectSlug: project.slug,
+  title: project.title,
+  year: project.year,
+  image: project.image,
+  alt: project.alt,
+  order: Number(project.number),
+}))
+
 type SiteSettings = {
   siteTitle: string
   homeEyebrow: string
@@ -252,6 +272,19 @@ function isProject(value: unknown): value is Project {
     (value.deliverables === undefined ||
       (Array.isArray(value.deliverables) &&
         value.deliverables.every((deliverable) => typeof deliverable === "string")))
+  )
+}
+
+function isWorkItem(value: unknown): value is WorkItem {
+  return (
+    isRecord(value) &&
+    typeof value.slug === "string" &&
+    typeof value.projectSlug === "string" &&
+    typeof value.title === "string" &&
+    typeof value.year === "string" &&
+    typeof value.image === "string" &&
+    typeof value.alt === "string" &&
+    typeof value.order === "number"
   )
 }
 
@@ -645,6 +678,7 @@ export default function App() {
   const [spin, setSpin] = useState(0)
   const [selectedProject, setSelectedProject] = useState<Project | null>(null)
   const [projects, setProjects] = useState<Project[]>(defaultProjects)
+  const [workItems, setWorkItems] = useState<WorkItem[]>(defaultWork)
   const [settings, setSettings] = useState(defaultSettings)
   const [posts, setPosts] = useState<Post[]>([])
   const [contentError, setContentError] = useState<string | null>(null)
@@ -668,9 +702,10 @@ export default function App() {
     }
 
     const loadContent = async () => {
-      const [settingsData, projectsData, postsData] = await Promise.all([
+      const [settingsData, projectsData, workData, postsData] = await Promise.all([
         loadJson("site-settings.json"),
-        loadJson("projects.json"),
+        loadJson("projects-index.json"),
+        loadJson("work-index.json"),
         loadJson("posts.json"),
       ])
       if (!isSiteSettings(settingsData)) {
@@ -682,7 +717,14 @@ export default function App() {
         !projectsData.projects.every(isProject) ||
         projectsData.projects.length === 0
       ) {
-        throw new Error("content/projects.json must contain one or more valid projects.")
+        throw new Error("content/projects-index.json must contain one or more valid projects.")
+      }
+      if (
+        !isRecord(workData) ||
+        !Array.isArray(workData.work) ||
+        !workData.work.every(isWorkItem)
+      ) {
+        throw new Error("content/work-index.json must contain a list of valid work items.")
       }
       if (
         !isRecord(postsData) ||
@@ -694,6 +736,7 @@ export default function App() {
       if (cancelled) return
       setSettings(settingsData)
       setProjects(projectsData.projects)
+      setWorkItems(workData.work)
       setPosts(postsData.posts)
       setContentError(null)
     }
@@ -1084,19 +1127,34 @@ export default function App() {
               <p className="eyebrow">Work · Visual index</p>
               <h2>Everything in view.</h2>
               <div className="work-masonry">
-                {projects.map((project) => (
-                  <button
-                    className="work-card"
-                    key={project.number}
-                    onClick={() => openProject(project)}
-                  >
-                    <img src={project.image} alt={project.alt} />
-                    <div>
-                      <strong>{project.title}</strong>
-                      <span>{project.year}</span>
-                    </div>
-                  </button>
-                ))}
+                {workItems.map((item) => {
+                  const project = projects.find(
+                    (entry) => entry.slug === item.projectSlug,
+                  )
+                  const cardContent = (
+                    <>
+                      <img src={item.image} alt={item.alt} />
+                      <div>
+                        <strong>{item.title}</strong>
+                        <span>{item.year}</span>
+                      </div>
+                    </>
+                  )
+
+                  return project ? (
+                    <button
+                      className="work-card"
+                      key={item.slug}
+                      onClick={() => openProject(project)}
+                    >
+                      {cardContent}
+                    </button>
+                  ) : (
+                    <article className="work-card" key={item.slug}>
+                      {cardContent}
+                    </article>
+                  )
+                })}
               </div>
             </div>
           )}

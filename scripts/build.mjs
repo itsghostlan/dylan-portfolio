@@ -2,6 +2,7 @@ import { readFile, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { build } from "vite";
 
+await import("./generate-content.mjs");
 await build();
 
 const configPath = resolve("dist/admin/config.yml");

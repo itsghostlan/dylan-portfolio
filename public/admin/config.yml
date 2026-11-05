@@ -8,76 +8,105 @@ media_folder: public/images/uploads
 public_folder: /images/uploads
 site_url: __SITE_URL__
 
-singletons:
-  - name: site_settings
-    label: Site Settings
-    file: public/content/site-settings.json
-    format: json
-    fields:
-      - { label: Site Name, name: siteTitle, widget: string }
-      - { label: Home Eyebrow, name: homeEyebrow, widget: string }
-      - { label: Hero Title, name: heroHeading, widget: string }
-      - { label: Hero Accent, name: heroAccent, widget: string }
-      - { label: Hero Description, name: heroDescription, widget: text }
-      - { label: About Heading, name: aboutHeading, widget: string }
-      - { label: About Biography, name: aboutBio, widget: text }
-      - { label: Experience, name: aboutExperience, widget: text }
-      - label: Skills
-        name: skills
-        widget: list
-        field: { label: Skill, name: skill, widget: string }
-      - { label: Contact Heading, name: contactHeading, widget: string }
-      - { label: Email, name: email, widget: string }
-      - label: Social Links
-        name: socials
-        widget: list
+collections:
+  - name: settings
+    label: Settings
+    files:
+      - name: site_settings
+        label: Site Settings
+        file: public/content/site-settings.json
+        format: json
         fields:
-          - { label: Name, name: label, widget: string }
-          - { label: URL, name: url, widget: string }
-      - { label: Copyright Year, name: copyrightYear, widget: string }
-      - { label: Footer Note, name: footerNote, widget: string }
+          - { label: Site Name, name: siteTitle, widget: string }
+          - { label: Home Eyebrow, name: homeEyebrow, widget: string }
+          - { label: Hero Title, name: heroHeading, widget: string }
+          - { label: Hero Accent, name: heroAccent, widget: string }
+          - { label: Hero Description, name: heroDescription, widget: text }
+          - { label: About Heading, name: aboutHeading, widget: string }
+          - { label: About Biography, name: aboutBio, widget: text }
+          - { label: Experience, name: aboutExperience, widget: text }
+          - label: Skills
+            name: skills
+            widget: list
+            field: { label: Skill, name: skill, widget: string }
+          - { label: Contact Heading, name: contactHeading, widget: string }
+          - { label: Email, name: email, widget: string }
+          - label: Social Links
+            name: socials
+            widget: list
+            fields:
+              - { label: Name, name: label, widget: string }
+              - { label: URL, name: url, widget: string }
+          - { label: Copyright Year, name: copyrightYear, widget: string }
+          - { label: Footer Note, name: footerNote, widget: string }
 
   - name: projects
     label: Projects
-    file: public/content/projects.json
+    folder: public/content/projects
+    create: true
+    extension: json
     format: json
+    slug: "{{slug}}"
+    summary: "{{number}} — {{title}}"
     fields:
-      - label: Projects
-        name: projects
+      - { label: URL Slug, name: slug, widget: string }
+      - { label: Display Number, name: number, widget: string }
+      - { label: Project Name, name: title, widget: string }
+      - { label: Category, name: type, widget: string }
+      - { label: Year, name: year, widget: string }
+      - { label: Role, name: role, widget: string }
+      - { label: Client, name: client, widget: string }
+      - { label: Featured on Home, name: featured, widget: boolean, default: false }
+      - { label: Thumbnail, name: image, widget: string }
+      - { label: Image Alt Text, name: alt, widget: string }
+      - label: Tags
+        name: tags
         widget: list
-        summary: "{{fields.title}} — {{fields.year}}"
-        fields:
-          - { label: URL Slug, name: slug, widget: string }
-          - { label: Project Name, name: title, widget: string }
-          - { label: Category, name: type, widget: string }
-          - { label: Year, name: year, widget: string }
-          - { label: Role, name: role, widget: string }
-          - { label: Client, name: client, widget: string }
-          - { label: Featured on Home, name: featured, widget: boolean, default: false }
-          - { label: Thumbnail, name: image, widget: string }
-          - { label: Image Alt Text, name: alt, widget: string }
-          - label: Tags
-            name: tags
-            widget: list
-            field: { label: Tag, name: tag, widget: string }
-          - label: Deliverables
-            name: deliverables
-            widget: list
-            field: { label: Deliverable, name: deliverable, widget: string }
+        field: { label: Tag, name: tag, widget: string }
+      - label: Deliverables
+        name: deliverables
+        widget: list
+        field: { label: Deliverable, name: deliverable, widget: string }
+
+  - name: work
+    label: Work
+    folder: public/content/work
+    create: true
+    extension: json
+    format: json
+    slug: "{{slug}}"
+    summary: "{{title}} — {{year}}"
+    fields:
+      - { label: URL Slug, name: slug, widget: string }
+      - label: Linked Project
+        name: projectSlug
+        widget: relation
+        collection: projects
+        search_fields: [title]
+        value_field: slug
+        display_fields: [title]
+      - { label: Display Title, name: title, widget: string }
+      - { label: Year, name: year, widget: string }
+      - { label: Image, name: image, widget: string }
+      - { label: Image Alt Text, name: alt, widget: string }
+      - { label: Display Order, name: order, widget: number, value_type: int, min: 1 }
 
   - name: posts
     label: Posts
-    file: public/content/posts.json
-    format: json
-    fields:
-      - label: Posts
-        name: posts
-        widget: list
-        summary: "{{fields.title}}"
+    files:
+      - name: posts
+        label: Studio Notes
+        file: public/content/posts.json
+        format: json
         fields:
-          - { label: URL Slug, name: slug, widget: string }
-          - { label: Title, name: title, widget: string }
-          - { label: Date, name: date, widget: datetime, format: "YYYY-MM-DD" }
-          - { label: Excerpt, name: excerpt, widget: text }
-          - { label: Body, name: body, widget: text }
-          - { label: Published, name: published, widget: boolean, default: false }
+          - label: Posts
+            name: posts
+            widget: list
+            summary: "{{fields.title}}"
+            fields:
+              - { label: URL Slug, name: slug, widget: string }
+              - { label: Title, name: title, widget: string }
+              - { label: Date, name: date, widget: datetime, format: "YYYY-MM-DD" }
+              - { label: Excerpt, name: excerpt, widget: text }
+              - { label: Body, name: body, widget: text }
+              - { label: Published, name: published, widget: boolean, default: false }

@@ -1,0 +1,14 @@
+{
+  "slug": "fold",
+  "number": "07",
+  "title": "Fold",
+  "type": "Spatial identity",
+  "year": "2022",
+  "featured": true,
+  "image": "https://images.unsplash.com/photo-1486718448742-163732cd1544?crop=entropy&cs=tinysrgb&fit=crop&fm=jpg&q=80&w=720",
+  "alt": "Minimal brown curved architectural structure",
+  "role": "Creative direction & design",
+  "client": "Fold Studio",
+  "tags": ["Spatial identity", "Art direction", "Featured"],
+  "deliverables": ["Creative strategy", "Visual identity system", "Digital design direction", "Launch toolkit"]
+}
