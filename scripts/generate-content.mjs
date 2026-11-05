@@ -3,9 +3,17 @@ import { resolve } from "node:path";
 
 async function loadEntries(directory) {
   const directoryPath = resolve("public/content", directory);
-  const filenames = (await readdir(directoryPath))
-    .filter((filename) => filename.endsWith(".json"))
-    .sort();
+  let filenames;
+  try {
+    filenames = (await readdir(directoryPath))
+      .filter((filename) => filename.endsWith(".json"))
+      .sort();
+  } catch (error) {
+    if (error.code === "ENOENT") {
+      return [];
+    }
+    throw error;
+  }
   const entries = await Promise.all(
     filenames.map(async (filename) => {
       const filePath = resolve(directoryPath, filename);
@@ -13,7 +21,13 @@ async function loadEntries(directory) {
       if (!entry || typeof entry !== "object" || Array.isArray(entry)) {
         throw new Error(`${filePath} must contain a JSON object.`);
       }
-      return entry;
+      return {
+        ...entry,
+        slug:
+          typeof entry.slug === "string" && entry.slug.trim()
+            ? entry.slug
+            : filename.slice(0, -".json".length),
+      };
     }),
   );
   return entries;
@@ -21,15 +35,13 @@ async function loadEntries(directory) {
 
 for (const collection of ["projects", "work"]) {
   const entries = await loadEntries(collection);
-  if (entries.length === 0) {
-    throw new Error(`The ${collection} collection must contain at least one entry.`);
-  }
   entries.sort((first, second) =>
     collection === "projects"
       ? String(first.number).localeCompare(String(second.number), undefined, {
           numeric: true,
         })
-      : Number(first.order) - Number(second.order),
+      : Number(first.order ?? Number.POSITIVE_INFINITY) -
+        Number(second.order ?? Number.POSITIVE_INFINITY),
   );
   await writeFile(
     resolve("public/content", `${collection}-index.json`),

@@ -587,6 +587,21 @@ footer {
   margin-top: 36px;
 }
 
+.empty-content {
+  color: rgb(54 54 54 / 62%);
+  font-family: 'Nova Mono', monospace;
+  font-size: 9px;
+  font-weight: 400;
+  line-height: 1.6;
+}
+
+.project-list > .empty-content,
+.home-posts > .empty-content,
+.contact-copy > .empty-content {
+  margin: 0;
+  padding: 18px 0;
+}
+
 .project {
   display: grid;
   grid-template-columns: minmax(0, 1.45fr) minmax(118px, 0.55fr);

@@ -32,120 +32,15 @@ const pages: { id: PageId; label: string; track: string }[] = [
   { id: "contact", label: "Contact", track: "04" },
 ]
 
-const defaultProjects = [
-  {
-    slug: "forma",
-    number: "01",
-    title: "Forma",
-    type: "Brand direction",
-    year: "2025",
-    featured: true,
-    image:
-      "https://images.unsplash.com/photo-1568394696869-8f44d26d11bc?crop=entropy&cs=tinysrgb&fit=crop&fm=jpg&q=80&w=480",
-    alt: "Multicolored geometric concrete buildings",
-  },
-  {
-    slug: "afterlight",
-    number: "02",
-    title: "Afterlight",
-    type: "Digital experience",
-    year: "2024",
-    featured: true,
-    image:
-      "https://images.unsplash.com/photo-1789938725934-0b97b0bfd365?crop=entropy&cs=tinysrgb&fit=crop&fm=jpg&q=80&w=480",
-    alt: "Colorful striped oval artwork",
-  },
-  {
-    slug: "common-ground",
-    number: "03",
-    title: "Common Ground",
-    type: "Campaign",
-    year: "2024",
-    featured: true,
-    image:
-      "https://images.unsplash.com/photo-1774444458513-bbeb06f7340d?crop=entropy&cs=tinysrgb&fit=crop&fm=jpg&q=80&w=480",
-    alt: "Minimal modern building against a blue sky",
-  },
-  {
-    slug: "soft-focus",
-    number: "04",
-    title: "Soft Focus",
-    type: "Editorial system",
-    year: "2023",
-    featured: true,
-    image:
-      "https://images.unsplash.com/photo-1656998019079-a7f9182c12be?crop=entropy&cs=tinysrgb&fit=crop&fm=jpg&q=80&w=480",
-    alt: "Abstract geometric diagram",
-  },
-  {
-    slug: "field-notes",
-    number: "05",
-    title: "Field Notes",
-    type: "Digital product",
-    year: "2023",
-    featured: true,
-    image:
-      "https://images.unsplash.com/photo-1696075619078-6cb640d329ec?crop=entropy&cs=tinysrgb&fit=crop&fm=jpg&q=80&w=480",
-    alt: "Cactus beside a minimal building",
-  },
-  {
-    slug: "open-signal",
-    number: "06",
-    title: "Open Signal",
-    type: "Brand identity",
-    year: "2022",
-    featured: true,
-    image:
-      "https://images.unsplash.com/photo-1789938725904-553468f362ab?crop=entropy&cs=tinysrgb&fit=crop&fm=jpg&q=80&w=480",
-    alt: "Curved purple and blue abstract bands",
-  },
-  {
-    slug: "fold",
-    number: "07",
-    title: "Fold",
-    type: "Spatial identity",
-    year: "2022",
-    featured: true,
-    image:
-      "https://images.unsplash.com/photo-1486718448742-163732cd1544?crop=entropy&cs=tinysrgb&fit=crop&fm=jpg&q=80&w=720",
-    alt: "Minimal brown curved architectural structure",
-  },
-  {
-    slug: "blue-hour",
-    number: "08",
-    title: "Blue Hour",
-    type: "Art direction",
-    year: "2021",
-    featured: true,
-    image:
-      "https://images.unsplash.com/photo-1601570682455-bdd0b87f0cfa?crop=entropy&cs=tinysrgb&fit=crop&fm=jpg&q=80&w=720",
-    alt: "White geometric building beneath a clear blue sky",
-  },
-  {
-    slug: "arc",
-    number: "09",
-    title: "Arc",
-    type: "Campaign system",
-    year: "2021",
-    featured: true,
-    image:
-      "https://images.unsplash.com/photo-1548248823-ce16a73b6d49?crop=entropy&cs=tinysrgb&fit=crop&fm=jpg&q=80&w=720",
-    alt: "Curved modern building against a blue sky",
-  },
-  {
-    slug: "still",
-    number: "10",
-    title: "Still",
-    type: "Editorial design",
-    year: "2020",
-    featured: true,
-    image:
-      "https://images.unsplash.com/photo-1592274951725-1688461e2019?crop=entropy&cs=tinysrgb&fit=crop&fm=jpg&q=80&w=720",
-    alt: "White concrete architecture under a blue sky",
-  },
-]
-
-type Project = typeof defaultProjects[number] & {
+type Project = {
+  slug: string
+  number: string
+  title: string
+  type: string
+  year: string
+  featured: boolean
+  image: string
+  alt: string
   role?: string
   client?: string
   tags?: string[]
@@ -159,18 +54,8 @@ type WorkItem = {
   year: string
   image: string
   alt: string
-  order: number
+  order?: number | null
 }
-
-const defaultWork: WorkItem[] = defaultProjects.map((project) => ({
-  slug: project.slug,
-  projectSlug: project.slug,
-  title: project.title,
-  year: project.year,
-  image: project.image,
-  alt: project.alt,
-  order: Number(project.number),
-}))
 
 type SiteSettings = {
   siteTitle: string
@@ -226,78 +111,89 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null
 }
 
-function isSiteSettings(value: unknown): value is SiteSettings {
-  return (
-    isRecord(value) &&
-    typeof value.siteTitle === "string" &&
-    typeof value.homeEyebrow === "string" &&
-    typeof value.heroHeading === "string" &&
-    typeof value.heroAccent === "string" &&
-    typeof value.heroDescription === "string" &&
-    typeof value.aboutHeading === "string" &&
-    typeof value.aboutBio === "string" &&
-    typeof value.aboutExperience === "string" &&
-    Array.isArray(value.skills) &&
-    value.skills.every((skill) => typeof skill === "string") &&
-    typeof value.contactHeading === "string" &&
-    typeof value.email === "string" &&
-    Array.isArray(value.socials) &&
-    value.socials.every(
-      (social) =>
-        isRecord(social) &&
-        typeof social.label === "string" &&
-        typeof social.url === "string",
-    ) &&
-    typeof value.footerNote === "string" &&
-    typeof value.copyrightYear === "string"
-  )
+function contentOrEmpty(value: string): string {
+  return value.trim() || "No content yet."
 }
 
-function isProject(value: unknown): value is Project {
-  return (
-    isRecord(value) &&
-    typeof value.slug === "string" &&
-    typeof value.number === "string" &&
-    typeof value.title === "string" &&
-    typeof value.type === "string" &&
-    typeof value.year === "string" &&
-    typeof value.featured === "boolean" &&
-    typeof value.image === "string" &&
-    typeof value.alt === "string" &&
-    (value.role === undefined || typeof value.role === "string") &&
-    (value.client === undefined || typeof value.client === "string") &&
-    (value.tags === undefined ||
-      (Array.isArray(value.tags) &&
-        value.tags.every((tag) => typeof tag === "string"))) &&
-    (value.deliverables === undefined ||
-      (Array.isArray(value.deliverables) &&
-        value.deliverables.every((deliverable) => typeof deliverable === "string")))
-  )
+function asString(value: unknown): string {
+  return typeof value === "string" ? value : ""
 }
 
-function isWorkItem(value: unknown): value is WorkItem {
-  return (
-    isRecord(value) &&
-    typeof value.slug === "string" &&
-    typeof value.projectSlug === "string" &&
-    typeof value.title === "string" &&
-    typeof value.year === "string" &&
-    typeof value.image === "string" &&
-    typeof value.alt === "string" &&
-    typeof value.order === "number"
-  )
+function parseSiteSettings(value: unknown): SiteSettings | null {
+  if (!isRecord(value)) return null
+  const skills = Array.isArray(value.skills) ? value.skills : []
+  const socials = Array.isArray(value.socials) ? value.socials : []
+  return {
+    siteTitle: asString(value.siteTitle),
+    homeEyebrow: asString(value.homeEyebrow),
+    heroHeading: asString(value.heroHeading),
+    heroAccent: asString(value.heroAccent),
+    heroDescription: asString(value.heroDescription),
+    aboutHeading: asString(value.aboutHeading),
+    aboutBio: asString(value.aboutBio),
+    aboutExperience: asString(value.aboutExperience),
+    skills: skills.filter((skill): skill is string => typeof skill === "string"),
+    contactHeading: asString(value.contactHeading),
+    email: asString(value.email),
+    socials: socials.filter(isRecord).map((social) => ({
+      label: asString(social.label),
+      url: asString(social.url),
+    })),
+    footerNote: asString(value.footerNote),
+    copyrightYear: asString(value.copyrightYear),
+  }
 }
 
-function isPost(value: unknown): value is Post {
-  return (
-    isRecord(value) &&
-    typeof value.slug === "string" &&
-    typeof value.title === "string" &&
-    typeof value.date === "string" &&
-    typeof value.excerpt === "string" &&
-    typeof value.body === "string" &&
-    typeof value.published === "boolean"
-  )
+function parseProject(value: unknown): Project | null {
+  if (!isRecord(value)) return null
+  const tags = Array.isArray(value.tags) ? value.tags : []
+  const deliverables = Array.isArray(value.deliverables)
+    ? value.deliverables
+    : []
+  return {
+    slug: asString(value.slug),
+    number: asString(value.number),
+    title: asString(value.title),
+    type: asString(value.type),
+    year: asString(value.year),
+    featured: value.featured === true,
+    image: asString(value.image),
+    alt: asString(value.alt),
+    role: asString(value.role),
+    client: asString(value.client),
+    tags: tags.filter((tag): tag is string => typeof tag === "string"),
+    deliverables: deliverables.filter(
+      (deliverable): deliverable is string => typeof deliverable === "string",
+    ),
+  }
+}
+
+function parseWorkItem(value: unknown): WorkItem | null {
+  if (!isRecord(value)) return null
+  return {
+    slug: asString(value.slug),
+    projectSlug: asString(value.projectSlug),
+    title: asString(value.title),
+    year: asString(value.year),
+    image: asString(value.image),
+    alt: asString(value.alt),
+    order:
+      typeof value.order === "number" || value.order === null
+        ? value.order
+        : undefined,
+  }
+}
+
+function parsePost(value: unknown): Post | null {
+  if (!isRecord(value)) return null
+  return {
+    slug: asString(value.slug),
+    title: asString(value.title),
+    date: asString(value.date),
+    excerpt: asString(value.excerpt),
+    body: asString(value.body),
+    published: value.published === true,
+  }
 }
 
 const needleAngles: Record<PageId, number> = {
@@ -495,7 +391,7 @@ function ProjectDetailPage({
     <main className="project-detail-shell">
       <header className="project-detail-nav">
         <button className="project-detail-brand" onClick={onBack}>
-          {settings.siteTitle}
+          {contentOrEmpty(settings.siteTitle)}
         </button>
         <button className="project-back" onClick={onBack}>
           <ArrowLeft aria-hidden="true" />
@@ -517,21 +413,21 @@ function ProjectDetailPage({
                 <UserRound aria-hidden="true" />
                 Role
               </span>
-              <strong>{project.role || "Creative direction & design"}</strong>
+            <strong>{contentOrEmpty(project.role ?? "")}</strong>
             </div>
             <div>
               <span>
                 <Building2 aria-hidden="true" />
                 Client
               </span>
-              <strong>{project.client || `${project.title} Studio`}</strong>
+            <strong>{contentOrEmpty(project.client ?? "")}</strong>
             </div>
             <div>
               <span>
                 <CalendarDays aria-hidden="true" />
                 Year
               </span>
-              <strong>{project.year}</strong>
+              <strong>{contentOrEmpty(project.year)}</strong>
             </div>
           </div>
         </header>
@@ -543,11 +439,15 @@ function ProjectDetailPage({
               onClick={() => setIsLightboxOpen(true)}
               aria-label="Enlarge current image"
             >
-              <img
-                key={media[activeMedia].src}
-                src={media[activeMedia].src}
-                alt={media[activeMedia].alt}
-              />
+              {media[activeMedia].src ? (
+                <img
+                  key={media[activeMedia].src}
+                  src={media[activeMedia].src}
+                  alt={media[activeMedia].alt}
+                />
+              ) : (
+                <span className="empty-content">No content yet.</span>
+              )}
               <span>
                 <Maximize2 aria-hidden="true" />
                 Click to enlarge
@@ -577,7 +477,7 @@ function ProjectDetailPage({
                   onClick={() => setActiveMedia(index)}
                   aria-label={`View image ${index + 1}`}
                 >
-                  <img src={item.src} alt="" />
+                  {item.src ? <img src={item.src} alt="" /> : <span />}
                 </button>
               ))}
             </div>
@@ -595,10 +495,11 @@ function ProjectDetailPage({
               Tags
             </p>
             <div className="detail-tags">
-              {(project.tags?.length
-                ? project.tags
-                : [project.type, "Art direction", "Featured"]
-              ).map((tag) => <span key={tag}>{tag}</span>)}
+              {project.tags?.length ? (
+                project.tags.map((tag) => <span key={tag}>{tag}</span>)
+              ) : (
+                <span className="empty-content">No content yet.</span>
+              )}
             </div>
           </div>
           <div>
@@ -606,17 +507,15 @@ function ProjectDetailPage({
               <PackageCheck aria-hidden="true" />
               Deliverables
             </p>
-            <ul>
-              {(project.deliverables?.length
-                ? project.deliverables
-                : [
-                    "Creative strategy",
-                    "Visual identity system",
-                    "Digital design direction",
-                    "Launch toolkit",
-                  ]
-              ).map((deliverable) => <li key={deliverable}>{deliverable}</li>)}
-            </ul>
+            {project.deliverables?.length ? (
+              <ul>
+                {project.deliverables.map((deliverable) => (
+                  <li key={deliverable}>{deliverable}</li>
+                ))}
+              </ul>
+            ) : (
+              <p className="empty-content">No content yet.</p>
+            )}
           </div>
         </div>
       </article>
@@ -642,20 +541,24 @@ function ProjectDetailPage({
           >
             <ChevronLeft aria-hidden="true" />
           </button>
-          <img src={media[activeMedia].src} alt={media[activeMedia].alt} />
+          {media[activeMedia].src ? (
+            <img src={media[activeMedia].src} alt={media[activeMedia].alt} />
+          ) : (
+            <span className="empty-content">No content yet.</span>
+          )}
           <button onClick={() => moveMedia(1)} aria-label="Next enlarged image">
             <ChevronRight aria-hidden="true" />
           </button>
         </div>
       )}
       <footer>
-        <p>{settings.footerNote}</p>
+        <p>{contentOrEmpty(settings.footerNote)}</p>
         <p className="now-playing">
           <span>Now playing</span>
-          {project.title}
+          {contentOrEmpty(project.title)}
         </p>
         <div className="footer-meta">
-          <p>© {settings.copyrightYear}</p>
+          <p>© {contentOrEmpty(settings.copyrightYear)}</p>
           <a
             className="footer-admin"
             href="./admin/"
@@ -677,8 +580,8 @@ export default function App() {
   const [page, setPage] = useState<PageId>("home")
   const [spin, setSpin] = useState(0)
   const [selectedProject, setSelectedProject] = useState<Project | null>(null)
-  const [projects, setProjects] = useState<Project[]>(defaultProjects)
-  const [workItems, setWorkItems] = useState<WorkItem[]>(defaultWork)
+  const [projects, setProjects] = useState<Project[]>([])
+  const [workItems, setWorkItems] = useState<WorkItem[]>([])
   const [settings, setSettings] = useState(defaultSettings)
   const [posts, setPosts] = useState<Post[]>([])
   const [contentError, setContentError] = useState<string | null>(null)
@@ -708,36 +611,43 @@ export default function App() {
         loadJson("work-index.json"),
         loadJson("posts.json"),
       ])
-      if (!isSiteSettings(settingsData)) {
+      const loadedSettings = parseSiteSettings(settingsData)
+      if (!loadedSettings) {
         throw new Error("content/site-settings.json has an invalid shape.")
       }
       if (
         !isRecord(projectsData) ||
-        !Array.isArray(projectsData.projects) ||
-        !projectsData.projects.every(isProject) ||
-        projectsData.projects.length === 0
+        !Array.isArray(projectsData.projects)
       ) {
-        throw new Error("content/projects-index.json must contain one or more valid projects.")
+        throw new Error("content/projects-index.json must contain a list of valid projects.")
       }
       if (
         !isRecord(workData) ||
-        !Array.isArray(workData.work) ||
-        !workData.work.every(isWorkItem)
+        !Array.isArray(workData.work)
       ) {
         throw new Error("content/work-index.json must contain a list of valid work items.")
       }
       if (
         !isRecord(postsData) ||
-        !Array.isArray(postsData.posts) ||
-        !postsData.posts.every(isPost)
+        !Array.isArray(postsData.posts)
       ) {
         throw new Error("content/posts.json must contain a list of valid posts.")
       }
+      const loadedProjects = projectsData.projects.map(parseProject)
+      const loadedWork = workData.work.map(parseWorkItem)
+      const loadedPosts = postsData.posts.map(parsePost)
+      if (
+        loadedProjects.some((project) => project === null) ||
+        loadedWork.some((item) => item === null) ||
+        loadedPosts.some((post) => post === null)
+      ) {
+        throw new Error("Content entries must be JSON objects.")
+      }
       if (cancelled) return
-      setSettings(settingsData)
-      setProjects(projectsData.projects)
-      setWorkItems(workData.work)
-      setPosts(postsData.posts)
+      setSettings(loadedSettings)
+      setProjects(loadedProjects.filter((project): project is Project => project !== null))
+      setWorkItems(loadedWork.filter((item): item is WorkItem => item !== null))
+      setPosts(loadedPosts.filter((post): post is Post => post !== null))
       setContentError(null)
     }
 
@@ -755,7 +665,7 @@ export default function App() {
   }, [])
 
   useEffect(() => {
-    document.title = settings.siteTitle
+    document.title = contentOrEmpty(settings.siteTitle)
     const syncHash = () => {
       const hash = window.location.hash.slice(1)
       if (hash.startsWith("project-")) {
@@ -990,13 +900,13 @@ export default function App() {
             <div className="home-copy">
               <div className="home-welcome">
                 <div>
-                  <p className="eyebrow">{settings.homeEyebrow}</p>
+                  <p className="eyebrow">{contentOrEmpty(settings.homeEyebrow)}</p>
                   <h1>
-                    {settings.heroHeading}
+                    {contentOrEmpty(settings.heroHeading)}
                     <br />
-                    <em>{settings.heroAccent}</em>
+                    <em>{contentOrEmpty(settings.heroAccent)}</em>
                   </h1>
-                  <p className="intro">{settings.heroDescription}</p>
+                  <p className="intro">{contentOrEmpty(settings.heroDescription)}</p>
                 </div>
                 <figure className="welcome-image">
                   <img
@@ -1013,20 +923,29 @@ export default function App() {
                   <span>{String(Math.min(projects.filter((project) => project.featured).length, 3)).padStart(2, "0")} projects</span>
                 </div>
                 <div className="project-list">
+                  {projects.filter((project) => project.featured).length === 0 && (
+                    <p className="empty-content">No content yet.</p>
+                  )}
                   {projects.filter((project) => project.featured).slice(0, 3).map((project) => (
                     <button
                       className="project"
-                      key={project.number}
+                      key={project.slug}
                       onClick={() => openProject(project)}
                     >
-                      <img
-                        className="project-thumb"
-                        src={project.image}
-                        alt={project.alt}
-                      />
+                      {project.image ? (
+                        <img
+                          className="project-thumb"
+                          src={project.image}
+                          alt={project.alt}
+                        />
+                      ) : (
+                        <span className="project-thumb empty-content">
+                          No content yet.
+                        </span>
+                      )}
                       <div className="project-details">
                         <div className="project-topline">
-                          <span>{project.number}</span>
+                          <span>{contentOrEmpty(project.number)}</span>
                           {project.featured && (
                             <span className="featured-tag">
                               <Sparkles aria-hidden="true" />
@@ -1034,9 +953,9 @@ export default function App() {
                             </span>
                           )}
                         </div>
-                        <strong>{project.title}</strong>
-                        <small>{project.type}</small>
-                        <small>{project.year}</small>
+                        <strong>{contentOrEmpty(project.title)}</strong>
+                        <small>{contentOrEmpty(project.type)}</small>
+                        <small>{contentOrEmpty(project.year)}</small>
                         <ArrowIcon />
                       </div>
                     </button>
@@ -1050,37 +969,43 @@ export default function App() {
                   <ArrowIcon />
                 </button>
               </div>
-              {posts.some((post) => post.published) && (
-                <section className="home-posts" aria-labelledby="studio-notes-title">
+              <section className="home-posts" aria-labelledby="studio-notes-title">
                   <div className="section-heading">
                     <p className="eyebrow" id="studio-notes-title">Studio notes</p>
                     <span>{String(posts.filter((post) => post.published).length).padStart(2, "0")} posts</span>
                   </div>
+                  {posts.filter((post) => post.published).length === 0 && (
+                    <p className="empty-content">No content yet.</p>
+                  )}
                   {posts.filter((post) => post.published).map((post) => (
                     <article className="home-post" key={post.slug}>
-                      <time dateTime={post.date}>{post.date}</time>
+                      <time dateTime={post.date}>{contentOrEmpty(post.date)}</time>
                       <div>
-                        <h3>{post.title}</h3>
-                        <p>{post.excerpt}</p>
+                        <h3>{contentOrEmpty(post.title)}</h3>
+                        <p>{contentOrEmpty(post.excerpt)}</p>
                         {post.body && <details><summary>Read note</summary><p>{post.body}</p></details>}
                       </div>
                     </article>
                   ))}
-                </section>
-              )}
+              </section>
             </div>
           )}
 
           {page === "about" && (
             <div className="editorial-copy">
               <p className="eyebrow">Side A · About</p>
-              <h2>{settings.aboutHeading}</h2>
+              <h2>{contentOrEmpty(settings.aboutHeading)}</h2>
               <div className="two-column">
-                <p>{settings.aboutBio}</p>
-                <p>{settings.aboutExperience}</p>
+                <p>{contentOrEmpty(settings.aboutBio)}</p>
+                <p>{contentOrEmpty(settings.aboutExperience)}</p>
               </div>
               <div className="credits">
-                {settings.skills.map((skill) => <span key={skill}>{skill}</span>)}
+                {settings.skills.filter((skill) => skill.trim()).length === 0 && (
+                  <span className="empty-content">No content yet.</span>
+                )}
+                {settings.skills.filter((skill) => skill.trim()).map((skill) => (
+                  <span key={skill}>{skill}</span>
+                ))}
               </div>
             </div>
           )}
@@ -1090,20 +1015,29 @@ export default function App() {
               <p className="eyebrow">Archive · All projects</p>
               <h2>Projects in rotation.</h2>
               <div className="project-list">
+                {projects.length === 0 && (
+                  <p className="empty-content">No content yet.</p>
+                )}
                 {projects.map((project) => (
                   <button
                     className="project"
-                    key={project.number}
+                    key={project.slug}
                     onClick={() => openProject(project)}
                   >
-                    <img
-                      className="project-thumb"
-                      src={project.image}
-                      alt={project.alt}
-                    />
+                    {project.image ? (
+                      <img
+                        className="project-thumb"
+                        src={project.image}
+                        alt={project.alt}
+                      />
+                    ) : (
+                      <span className="project-thumb empty-content">
+                        No content yet.
+                      </span>
+                    )}
                     <div className="project-details">
                       <div className="project-topline">
-                        <span>{project.number}</span>
+                        <span>{contentOrEmpty(project.number)}</span>
                         {project.featured && (
                           <span className="featured-tag">
                             <Sparkles aria-hidden="true" />
@@ -1111,9 +1045,9 @@ export default function App() {
                           </span>
                         )}
                       </div>
-                      <strong>{project.title}</strong>
-                      <small>{project.type}</small>
-                      <small>{project.year}</small>
+                      <strong>{contentOrEmpty(project.title)}</strong>
+                      <small>{contentOrEmpty(project.type)}</small>
+                      <small>{contentOrEmpty(project.year)}</small>
                       <ArrowIcon />
                     </div>
                   </button>
@@ -1127,16 +1061,23 @@ export default function App() {
               <p className="eyebrow">Work · Visual index</p>
               <h2>Everything in view.</h2>
               <div className="work-masonry">
+                {workItems.length === 0 && (
+                  <p className="empty-content">No content yet.</p>
+                )}
                 {workItems.map((item) => {
                   const project = projects.find(
                     (entry) => entry.slug === item.projectSlug,
                   )
                   const cardContent = (
                     <>
-                      <img src={item.image} alt={item.alt} />
+                      {item.image ? (
+                        <img src={item.image} alt={item.alt} />
+                      ) : (
+                        <span className="empty-content">No content yet.</span>
+                      )}
                       <div>
-                        <strong>{item.title}</strong>
-                        <span>{item.year}</span>
+                        <strong>{contentOrEmpty(item.title)}</strong>
+                        <span>{contentOrEmpty(item.year)}</span>
                       </div>
                     </>
                   )
@@ -1162,13 +1103,20 @@ export default function App() {
           {page === "contact" && (
             <div className="editorial-copy contact-copy">
               <p className="eyebrow">Needle drop · Contact</p>
-              <h2>{settings.contactHeading}</h2>
-              <a href={`mailto:${settings.email}`}>
-                {settings.email}
-                <ArrowIcon />
-              </a>
+              <h2>{contentOrEmpty(settings.contactHeading)}</h2>
+              {settings.email.trim() ? (
+                <a href={`mailto:${settings.email}`}>
+                  {settings.email}
+                  <ArrowIcon />
+                </a>
+              ) : (
+                <p className="empty-content">No content yet.</p>
+              )}
               <div className="socials">
-                {settings.socials.map((social) => (
+                {settings.socials.every((social) => !social.label.trim() || !social.url.trim()) && (
+                  <p className="empty-content">No content yet.</p>
+                )}
+                {settings.socials.filter((social) => social.label.trim() && social.url.trim()).map((social) => (
                   <a key={social.label} href={social.url}>{social.label}</a>
                 ))}
               </div>
@@ -1178,13 +1126,13 @@ export default function App() {
       </section>
 
       <footer>
-        <p>{settings.footerNote}</p>
+        <p>{contentOrEmpty(settings.footerNote)}</p>
         <p className="now-playing">
           <span>Now playing</span>
           {pages.find((item) => item.id === page)?.label}
         </p>
         <div className="footer-meta">
-          <p>© {settings.copyrightYear}</p>
+          <p>© {contentOrEmpty(settings.copyrightYear)}</p>
           <a
             className="footer-admin"
             href="./admin/"

@@ -34,6 +34,6 @@ Vercel CLI can also add environment variables after authenticating with `npx ver
 
 ## Content and Sveltia CMS
 
-The app loads public JSON content at runtime from `public/content/`. The Sveltia CMS editor is at `/admin/`; its small GitHub icon is in the site footer. The CMS has separate Settings, Projects, Work, and Posts sections. Each project and Work gallery item has its own JSON entry under `public/content/projects/` and `public/content/work/`; the build generates the indexes the site reads. Work gallery entries link to project details and can be reordered independently. Published posts appear on the home page.
+The app loads public JSON content at runtime from `public/content/`. The Sveltia CMS editor is at `/admin/`; its small GitHub icon is in the site footer. The CMS has separate Settings, Projects, Work, and Posts sections, and content fields can be left blank. Each project and Work gallery item has its own JSON entry under `public/content/projects/` and `public/content/work/`; the build generates the indexes the site reads, including when either collection folder is empty or absent. Work gallery entries link to project details and can be reordered independently. Empty sections show “No content yet.” Published posts appear on the home page.
 
 The GitHub backend is configured for `itsghostlan/dylan-portfolio` on `main` in [public/admin/config.yml](./public/admin/config.yml). CMS edits commit directly to the content JSON files, and Vercel automatically deploys the new commit.
