@@ -1,0 +1,84 @@
+backend:
+  name: github
+  repo: itsghostlan/dylan-portfolio
+  branch: main
+  # Set base_url to your deployed Sveltia CMS Authenticator URL for GitHub OAuth.
+  # Never put a GitHub OAuth client secret in this file.
+
+media_folder: public/images/uploads
+public_folder: /images/uploads
+site_url: https://itsghostlan.github.io/dylan-portfolio/
+
+singletons:
+  - name: site_settings
+    label: Site Settings
+    file: public/content/site-settings.json
+    format: json
+    fields:
+      - { label: Site Name, name: siteTitle, widget: string }
+      - { label: Home Eyebrow, name: homeEyebrow, widget: string }
+      - { label: Hero Title, name: heroHeading, widget: string }
+      - { label: Hero Accent, name: heroAccent, widget: string }
+      - { label: Hero Description, name: heroDescription, widget: text }
+      - { label: About Heading, name: aboutHeading, widget: string }
+      - { label: About Biography, name: aboutBio, widget: text }
+      - { label: Experience, name: aboutExperience, widget: text }
+      - label: Skills
+        name: skills
+        widget: list
+        field: { label: Skill, name: skill, widget: string }
+      - { label: Contact Heading, name: contactHeading, widget: string }
+      - { label: Email, name: email, widget: string }
+      - label: Social Links
+        name: socials
+        widget: list
+        fields:
+          - { label: Name, name: label, widget: string }
+          - { label: URL, name: url, widget: string }
+      - { label: Copyright Year, name: copyrightYear, widget: string }
+      - { label: Footer Note, name: footerNote, widget: string }
+
+  - name: projects
+    label: Projects
+    file: public/content/projects.json
+    format: json
+    fields:
+      - label: Projects
+        name: projects
+        widget: list
+        summary: "{{fields.title}} — {{fields.year}}"
+        fields:
+          - { label: URL Slug, name: slug, widget: string }
+          - { label: Project Name, name: title, widget: string }
+          - { label: Category, name: type, widget: string }
+          - { label: Year, name: year, widget: string }
+          - { label: Role, name: role, widget: string }
+          - { label: Client, name: client, widget: string }
+          - { label: Featured on Home, name: featured, widget: boolean, default: false }
+          - { label: Thumbnail, name: image, widget: string }
+          - { label: Image Alt Text, name: alt, widget: string }
+          - label: Tags
+            name: tags
+            widget: list
+            field: { label: Tag, name: tag, widget: string }
+          - label: Deliverables
+            name: deliverables
+            widget: list
+            field: { label: Deliverable, name: deliverable, widget: string }
+
+  - name: posts
+    label: Posts
+    file: public/content/posts.json
+    format: json
+    fields:
+      - label: Posts
+        name: posts
+        widget: list
+        summary: "{{fields.title}}"
+        fields:
+          - { label: URL Slug, name: slug, widget: string }
+          - { label: Title, name: title, widget: string }
+          - { label: Date, name: date, widget: datetime, format: "YYYY-MM-DD" }
+          - { label: Excerpt, name: excerpt, widget: text }
+          - { label: Body, name: body, widget: text }
+          - { label: Published, name: published, widget: boolean, default: false }

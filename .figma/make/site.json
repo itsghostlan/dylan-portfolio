@@ -1,0 +1,13 @@
+{
+  "description": "A creative portfolio showcases work across navigable pages, with a spinning vinyl disc that animates between sections and anchors the landing page.",
+  "robots": {
+    "index": true
+  },
+  "icons": {
+    "icon": "favicon.png"
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}

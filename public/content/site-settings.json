@@ -1,0 +1,20 @@
+{
+  "siteTitle": "itsghostlan",
+  "homeEyebrow": "Welcome · itsghostlan",
+  "heroHeading": "Ideas with",
+  "heroAccent": "good rhythm.",
+  "heroDescription": "An independent creative practice building identities, images, and digital worlds for people shaping culture.",
+  "aboutHeading": "Design should feel inevitable, never obvious.",
+  "aboutBio": "I’m itsghostlan, an independent designer working across identity, digital, and art direction. My practice is built on curiosity, clarity, and a healthy respect for the strange.",
+  "aboutExperience": "Previously at Studio North. Currently collaborating with founders, artists, and teams who care about making things with a point of view.",
+  "skills": ["Strategy", "Art direction", "Digital design", "Identity"],
+  "contactHeading": "Let’s make something worth replaying.",
+  "email": "hello@norareyes.design",
+  "socials": [
+    { "label": "Instagram", "url": "#instagram" },
+    { "label": "LinkedIn", "url": "#linkedin" },
+    { "label": "Are.na", "url": "#are.na" }
+  ],
+  "footerNote": "Independent since 2021",
+  "copyrightYear": "2025"
+}
