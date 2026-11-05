@@ -56,6 +56,7 @@ type WorkItem = {
 
 type SiteSettings = {
   siteTitle: string
+  favicon: string
   homeEyebrow: string
   heroHeading: string
   heroAccent: string
@@ -82,6 +83,7 @@ type Post = {
 
 const defaultSettings: SiteSettings = {
   siteTitle: "itsghostlan",
+  favicon: "",
   homeEyebrow: "Welcome · itsghostlan",
   heroHeading: "Ideas with",
   heroAccent: "good rhythm.",
@@ -150,6 +152,7 @@ function parseSiteSettings(value: unknown): SiteSettings | null {
   const socials = Array.isArray(value.socials) ? value.socials : []
   return {
     siteTitle: asString(value.siteTitle),
+    favicon: asString(value.favicon),
     homeEyebrow: asString(value.homeEyebrow),
     heroHeading: asString(value.heroHeading),
     heroAccent: asString(value.heroAccent),
@@ -687,6 +690,21 @@ export default function App() {
 
   useEffect(() => {
     document.title = contentOrEmpty(settings.siteTitle)
+    const faviconSelector = 'link[data-site-favicon="true"]'
+    const existingFavicon = document.head.querySelector<HTMLLinkElement>(
+      faviconSelector,
+    )
+    if (settings.favicon.trim()) {
+      const favicon =
+        existingFavicon ?? document.createElement("link")
+      favicon.rel = "icon"
+      favicon.href = new URL(settings.favicon, document.baseURI).toString()
+      favicon.dataset.siteFavicon = "true"
+      if (!existingFavicon) document.head.append(favicon)
+    } else {
+      existingFavicon?.remove()
+    }
+
     const syncHash = () => {
       const hash = window.location.hash.slice(1)
       if (hash.startsWith("project-")) {
@@ -707,7 +725,7 @@ export default function App() {
     syncHash()
     window.addEventListener("hashchange", syncHash)
     return () => window.removeEventListener("hashchange", syncHash)
-  }, [projects, settings.siteTitle])
+  }, [projects, settings.siteTitle, settings.favicon])
 
   const navigate = (nextPage: PageId) => {
     if (nextPage === page) {

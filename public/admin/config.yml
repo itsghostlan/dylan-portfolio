@@ -18,6 +18,7 @@ collections:
         format: json
         fields:
           - { label: Site Name, name: siteTitle, widget: string, required: false }
+          - { label: Favicon, name: favicon, widget: image, required: false }
           - { label: Home Eyebrow, name: homeEyebrow, widget: string, required: false }
           - { label: Hero Title, name: heroHeading, widget: string, required: false }
           - { label: Hero Accent, name: heroAccent, widget: string, required: false }
