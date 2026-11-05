@@ -2,12 +2,11 @@ backend:
   name: github
   repo: itsghostlan/dylan-portfolio
   branch: main
-  # Set base_url to your deployed Sveltia CMS Authenticator URL for GitHub OAuth.
-  # Never put a GitHub OAuth client secret in this file.
+  base_url: __OAUTH_BASE_URL__
 
 media_folder: public/images/uploads
 public_folder: /images/uploads
-site_url: https://itsghostlan.github.io/dylan-portfolio/
+site_url: __SITE_URL__
 
 singletons:
   - name: site_settings
