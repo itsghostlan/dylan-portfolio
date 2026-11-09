@@ -282,7 +282,7 @@ function Vinyl({
       className={`vinyl-stage ${isDragging ? "is-dragging" : ""}`}
       role="slider"
       tabIndex={0}
-      aria-label="Drag vertically to choose a page"
+      aria-label="Drag or swipe the vinyl to choose a page"
       aria-valuemin={0}
       aria-valuemax={pages.length - 1}
       aria-valuenow={activePageIndex}
@@ -611,7 +611,12 @@ export default function App() {
   const [contentError, setContentError] = useState<string | null>(null)
   const [dragOffset, setDragOffset] = useState(0)
   const [previewPageIndex, setPreviewPageIndex] = useState<number | null>(null)
-  const dragStart = useRef<{ y: number; index: number } | null>(null)
+  const dragStart = useRef<{
+    x: number
+    y: number
+    index: number
+    isMobile: boolean
+  } | null>(null)
   const wheelLocked = useRef(false)
   const isHome = page === "home"
   const activePageIndex = pages.findIndex((item) => item.id === page)
@@ -768,7 +773,12 @@ export default function App() {
   ) => {
     if (event.button !== 0) return
     event.currentTarget.setPointerCapture(event.pointerId)
-    dragStart.current = { y: event.clientY, index: activePageIndex }
+    dragStart.current = {
+      x: event.clientX,
+      y: event.clientY,
+      index: activePageIndex,
+      isMobile: window.matchMedia("(max-width: 560px)").matches,
+    }
     setPreviewPageIndex(activePageIndex)
     setDragOffset(0)
   }
@@ -777,19 +787,29 @@ export default function App() {
     event,
   ) => {
     if (!dragStart.current) return
-    const distance = event.clientY - dragStart.current.y
+    const distance = dragStart.current.isMobile
+      ? event.clientX - dragStart.current.x
+      : event.clientY - dragStart.current.y
+    const pageDistance = dragStart.current.isMobile
+      ? -distance / 85
+      : distance / 110
     const targetIndex = clampPageIndex(
-      Math.round(dragStart.current.index + distance / 110),
+      Math.round(dragStart.current.index + pageDistance),
     )
-    setDragOffset(distance * 0.85)
+    setDragOffset(distance * (dragStart.current.isMobile ? -0.85 : 0.85))
     setPreviewPageIndex(targetIndex)
   }
 
   const handleVinylPointerUp: PointerEventHandler<HTMLDivElement> = (event) => {
     if (!dragStart.current) return
-    const distance = event.clientY - dragStart.current.y
+    const distance = dragStart.current.isMobile
+      ? event.clientX - dragStart.current.x
+      : event.clientY - dragStart.current.y
+    const pageDistance = dragStart.current.isMobile
+      ? -distance / 85
+      : distance / 110
     const targetIndex = clampPageIndex(
-      Math.round(dragStart.current.index + distance / 110),
+      Math.round(dragStart.current.index + pageDistance),
     )
     dragStart.current = null
     setDragOffset(0)
@@ -801,9 +821,14 @@ export default function App() {
   }
 
   const handleVinylKeyDown: KeyboardEventHandler<HTMLDivElement> = (event) => {
-    if (event.key !== "ArrowDown" && event.key !== "ArrowUp") return
+    if (
+      !["ArrowDown", "ArrowUp", "ArrowLeft", "ArrowRight"].includes(event.key)
+    ) {
+      return
+    }
     event.preventDefault()
-    const direction = event.key === "ArrowDown" ? 1 : -1
+    const direction =
+      event.key === "ArrowDown" || event.key === "ArrowRight" ? 1 : -1
     const targetIndex = clampPageIndex(activePageIndex + direction)
     if (targetIndex !== activePageIndex) navigate(pages[targetIndex].id)
   }

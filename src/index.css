@@ -1513,14 +1513,36 @@ footer > :last-child {
 }
 
 @media (max-width: 560px) {
+  .audio-hero {
+    height: 717px;
+    min-height: 717px;
+  }
+
+  .record-area {
+    inset: 0 0 auto;
+    height: 717px;
+  }
+
   .vinyl-stage {
-    left: 0;
-    width: 430px;
+    top: calc(140px - 48vw);
+    left: 50%;
+    width: min(96vw, 900px);
+    transform: translate(-50%, -50%);
+  }
+
+  .is-inner .vinyl-stage {
+    left: 50%;
   }
 
   .needle-pivot {
     width: 44px;
     border-width: 6px;
+  }
+
+  .sound-visualizer {
+    inset: 4% 4% 40%;
+    gap: clamp(3px, 0.55vw, 7px);
+    opacity: 0.32;
   }
 
   .content-area {
@@ -1664,16 +1686,81 @@ footer > :last-child {
 
   .track-nav {
     inset: 0;
+    display: block;
+    height: 100%;
+    padding: 0;
   }
 
   .track-nav button {
+    position: absolute;
+    width: auto;
     gap: 7px;
+    padding: 8px;
+    color: var(--ink);
+    background: transparent;
+    border-radius: 0;
     font-size: 11px;
-    transform: rotate(var(--angle)) translateX(215px);
+    line-height: 1;
+    white-space: nowrap;
+    transform: none;
+    transform-origin: initial;
+    writing-mode: vertical-rl;
+    backdrop-filter: none;
+  }
+
+  .track-nav button:nth-child(1) {
+    top: min(32.5vw, 143px);
+    left: 10%;
+  }
+
+  .track-nav button:nth-child(2) {
+    top: min(37vw, 160px);
+    left: 24%;
+  }
+
+  .track-nav button:nth-child(3) {
+    top: min(41vw, 178px);
+    left: 43%;
+  }
+
+  .track-nav button:nth-child(4) {
+    top: min(37vw, 160px);
+    right: 20%;
+    left: auto;
+  }
+
+  .track-nav button:nth-child(5) {
+    top: min(32.5vw, 143px);
+    right: 6%;
+    left: auto;
+  }
+
+  .track-nav button::after {
+    display: none;
   }
 
   .track-nav button.active {
-    font-size: clamp(28px, 10vw, 42px);
+    top: min(50vw, 202px);
+    right: auto;
+    left: 50%;
+    color: var(--accent-deep);
+    background: transparent;
+    border-radius: 0;
+    font-size: clamp(36px, 9.5vw, 56px);
+    transform: translateX(-50%);
+    writing-mode: horizontal-tb;
+  }
+
+  .track-nav button.active::after {
+    display: block;
+  }
+
+  .track-nav button > span:first-child {
+    display: inline;
+  }
+
+  .track-nav button.active > span:first-child {
+    display: block;
   }
 
   .track-nav button span {
