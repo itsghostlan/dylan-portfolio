@@ -1,5 +1,5 @@
-import { auth } from "./shared.js";
+import { auth } from "./shared.js"
 
 export function GET(request: Request): Response {
-  return auth(request);
+  return auth(request)
 }
