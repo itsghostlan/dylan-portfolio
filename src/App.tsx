@@ -25,7 +25,7 @@ import { Analytics } from "@vercel/analytics/react"
 
 type PageId = "home" | "about" | "projects" | "work" | "contact"
 
-const pages: { id: PageId; label: string; track: string }[] = [
+const pages: { id: PageId label: string track: string }[] = [
   { id: "home", label: "Home", track: "00" },
   { id: "about", label: "About", track: "01" },
   { id: "projects", label: "Projects", track: "02" },
@@ -68,7 +68,7 @@ type SiteSettings = {
   skills: string[]
   contactHeading: string
   email: string
-  socials: { label: string; url: string }[]
+  socials: { label: string url: string }[]
   footerNote: string
   copyrightYear: string
 }
@@ -161,7 +161,9 @@ function parseSiteSettings(value: unknown): SiteSettings | null {
     aboutHeading: asString(value.aboutHeading),
     aboutBio: asString(value.aboutBio),
     aboutExperience: asString(value.aboutExperience),
-    skills: skills.filter((skill): skill is string => typeof skill === "string"),
+    skills: skills.filter(
+      (skill): skill is string => typeof skill === "string",
+    ),
     contactHeading: asString(value.contactHeading),
     email: asString(value.email),
     socials: socials.filter(isRecord).map((social) => ({
@@ -187,7 +189,9 @@ function parseProject(value: unknown): Project | null {
     type: asString(value.type),
     year: asString(value.year),
     featured: value.featured === true,
-    images: images.filter((image): image is string => typeof image === "string"),
+    images: images.filter(
+      (image): image is string => typeof image === "string",
+    ),
     role: asString(value.role),
     client: asString(value.client),
     tags: tags.filter((tag): tag is string => typeof tag === "string"),
@@ -435,14 +439,14 @@ function ProjectDetailPage({
                 <UserRound aria-hidden="true" />
                 Role
               </span>
-            <strong>{contentOrEmpty(project.role ?? "")}</strong>
+              <strong>{contentOrEmpty(project.role ?? "")}</strong>
             </div>
             <div>
               <span>
                 <Building2 aria-hidden="true" />
                 Client
               </span>
-            <strong>{contentOrEmpty(project.client ?? "")}</strong>
+              <strong>{contentOrEmpty(project.client ?? "")}</strong>
             </div>
             <div>
               <span>
@@ -613,7 +617,7 @@ export default function App() {
   const [contentError, setContentError] = useState<string | null>(null)
   const [dragOffset, setDragOffset] = useState(0)
   const [previewPageIndex, setPreviewPageIndex] = useState<number | null>(null)
-  const dragStart = useRef<{ y: number; index: number } | null>(null)
+  const dragStart = useRef<{ y: number index: number } | null>(null)
   const wheelLocked = useRef(false)
   const isHome = page === "home"
   const activePageIndex = pages.findIndex((item) => item.id === page)
@@ -631,33 +635,31 @@ export default function App() {
     }
 
     const loadContent = async () => {
-      const [settingsData, projectsData, workData, postsData] = await Promise.all([
-        loadJson("site-settings.json"),
-        loadJson("projects-index.json"),
-        loadJson("work-index.json"),
-        loadJson("posts.json"),
-      ])
+      const [settingsData, projectsData, workData, postsData] =
+        await Promise.all([
+          loadJson("site-settings.json"),
+          loadJson("projects-index.json"),
+          loadJson("work-index.json"),
+          loadJson("posts.json"),
+        ])
       const loadedSettings = parseSiteSettings(settingsData)
       if (!loadedSettings) {
         throw new Error("content/site-settings.json has an invalid shape.")
       }
-      if (
-        !isRecord(projectsData) ||
-        !Array.isArray(projectsData.projects)
-      ) {
-        throw new Error("content/projects-index.json must contain a list of valid projects.")
+      if (!isRecord(projectsData) || !Array.isArray(projectsData.projects)) {
+        throw new Error(
+          "content/projects-index.json must contain a list of valid projects.",
+        )
       }
-      if (
-        !isRecord(workData) ||
-        !Array.isArray(workData.work)
-      ) {
-        throw new Error("content/work-index.json must contain a list of valid work items.")
+      if (!isRecord(workData) || !Array.isArray(workData.work)) {
+        throw new Error(
+          "content/work-index.json must contain a list of valid work items.",
+        )
       }
-      if (
-        !isRecord(postsData) ||
-        !Array.isArray(postsData.posts)
-      ) {
-        throw new Error("content/posts.json must contain a list of valid posts.")
+      if (!isRecord(postsData) || !Array.isArray(postsData.posts)) {
+        throw new Error(
+          "content/posts.json must contain a list of valid posts.",
+        )
       }
       const loadedProjects = projectsData.projects.map(parseProject)
       const loadedWork = workData.work.map(parseWorkItem)
@@ -671,7 +673,11 @@ export default function App() {
       }
       if (cancelled) return
       setSettings(loadedSettings)
-      setProjects(loadedProjects.filter((project): project is Project => project !== null))
+      setProjects(
+        loadedProjects.filter(
+          (project): project is Project => project !== null,
+        ),
+      )
       setWorkItems(loadedWork.filter((item): item is WorkItem => item !== null))
       setPosts(loadedPosts.filter((post): post is Post => post !== null))
       setContentError(null)
@@ -680,7 +686,9 @@ export default function App() {
     loadContent().catch((error: unknown) => {
       if (cancelled) return
       const message =
-        error instanceof Error ? error.message : "Unknown content loading error."
+        error instanceof Error
+          ? error.message
+          : "Unknown content loading error."
       console.error("Portfolio content could not be loaded.", error)
       setContentError(message)
     })
@@ -693,12 +701,10 @@ export default function App() {
   useEffect(() => {
     document.title = contentOrEmpty(settings.siteTitle)
     const faviconSelector = 'link[data-site-favicon="true"]'
-    const existingFavicon = document.head.querySelector<HTMLLinkElement>(
-      faviconSelector,
-    )
+    const existingFavicon =
+      document.head.querySelector<HTMLLinkElement>(faviconSelector)
     if (settings.favicon.trim()) {
-      const favicon =
-        existingFavicon ?? document.createElement("link")
+      const favicon = existingFavicon ?? document.createElement("link")
       favicon.rel = "icon"
       favicon.href = new URL(settings.favicon, document.baseURI).toString()
       favicon.dataset.siteFavicon = "true"
@@ -941,13 +947,17 @@ export default function App() {
             <div className="home-copy">
               <div className="home-welcome">
                 <div>
-                  <p className="eyebrow">{contentOrEmpty(settings.homeEyebrow)}</p>
+                  <p className="eyebrow">
+                    {contentOrEmpty(settings.homeEyebrow)}
+                  </p>
                   <h1>
                     {contentOrEmpty(settings.heroHeading)}
                     <br />
                     <em>{contentOrEmpty(settings.heroAccent)}</em>
                   </h1>
-                  <p className="intro">{contentOrEmpty(settings.heroDescription)}</p>
+                  <p className="intro">
+                    {contentOrEmpty(settings.heroDescription)}
+                  </p>
                 </div>
                 <figure className="welcome-image">
                   <img
@@ -961,46 +971,56 @@ export default function App() {
               <div className="home-selected">
                 <div className="section-heading">
                   <p className="eyebrow">Selected work</p>
-                  <span>{String(Math.min(projects.filter((project) => project.featured).length, 3)).padStart(2, "0")} projects</span>
+                  <span>
+                    {String(
+                      Math.min(
+                        projects.filter((project) => project.featured).length,
+                        3,
+                      ),
+                    ).padStart(2, "0")}{" "}
+                    projects
+                  </span>
                 </div>
                 <div className="project-list">
-                  {projects.filter((project) => project.featured).length === 0 && (
-                    <p className="empty-content">No content yet.</p>
-                  )}
-                  {projects.filter((project) => project.featured).slice(0, 3).map((project) => (
-                    <button
-                      className="project"
-                      key={project.slug}
-                      onClick={() => openProject(project)}
-                    >
-                      {project.images[0] ? (
-                        <MediaPreview
-                          className="project-thumb"
-                          source={project.images[0]}
-                          alt={project.title || "Project image"}
-                        />
-                      ) : (
-                        <span className="project-thumb empty-content">
-                          No content yet.
-                        </span>
-                      )}
-                      <div className="project-details">
-                        <div className="project-topline">
-                          <span>{contentOrEmpty(project.number)}</span>
-                          {project.featured && (
-                            <span className="featured-tag">
-                              <Sparkles aria-hidden="true" />
-                              Featured
-                            </span>
-                          )}
+                  {projects.filter((project) => project.featured).length ===
+                    0 && <p className="empty-content">No content yet.</p>}
+                  {projects
+                    .filter((project) => project.featured)
+                    .slice(0, 3)
+                    .map((project) => (
+                      <button
+                        className="project"
+                        key={project.slug}
+                        onClick={() => openProject(project)}
+                      >
+                        {project.images[0] ? (
+                          <MediaPreview
+                            className="project-thumb"
+                            source={project.images[0]}
+                            alt={project.title || "Project image"}
+                          />
+                        ) : (
+                          <span className="project-thumb empty-content">
+                            No content yet.
+                          </span>
+                        )}
+                        <div className="project-details">
+                          <div className="project-topline">
+                            <span>{contentOrEmpty(project.number)}</span>
+                            {project.featured && (
+                              <span className="featured-tag">
+                                <Sparkles aria-hidden="true" />
+                                Featured
+                              </span>
+                            )}
+                          </div>
+                          <strong>{contentOrEmpty(project.title)}</strong>
+                          <small>{contentOrEmpty(project.type)}</small>
+                          <small>{contentOrEmpty(project.year)}</small>
+                          <ArrowIcon />
                         </div>
-                        <strong>{contentOrEmpty(project.title)}</strong>
-                        <small>{contentOrEmpty(project.type)}</small>
-                        <small>{contentOrEmpty(project.year)}</small>
-                        <ArrowIcon />
-                      </div>
-                    </button>
-                  ))}
+                      </button>
+                    ))}
                 </div>
                 <button
                   className="all-work-button"
@@ -1010,21 +1030,40 @@ export default function App() {
                   <ArrowIcon />
                 </button>
               </div>
-              <section className="home-posts" aria-labelledby="studio-notes-title">
-                  <div className="section-heading">
-                    <p className="eyebrow" id="studio-notes-title">Studio notes</p>
-                    <span>{String(posts.filter((post) => post.published).length).padStart(2, "0")} posts</span>
-                  </div>
-                  {posts.filter((post) => post.published).length === 0 && (
-                    <p className="empty-content">No content yet.</p>
-                  )}
-                  {posts.filter((post) => post.published).map((post) => (
+              <section
+                className="home-posts"
+                aria-labelledby="studio-notes-title"
+              >
+                <div className="section-heading">
+                  <p className="eyebrow" id="studio-notes-title">
+                    Studio notes
+                  </p>
+                  <span>
+                    {String(
+                      posts.filter((post) => post.published).length,
+                    ).padStart(2, "0")}{" "}
+                    posts
+                  </span>
+                </div>
+                {posts.filter((post) => post.published).length === 0 && (
+                  <p className="empty-content">No content yet.</p>
+                )}
+                {posts
+                  .filter((post) => post.published)
+                  .map((post) => (
                     <article className="home-post" key={post.slug}>
-                      <time dateTime={post.date}>{contentOrEmpty(post.date)}</time>
+                      <time dateTime={post.date}>
+                        {contentOrEmpty(post.date)}
+                      </time>
                       <div>
                         <h3>{contentOrEmpty(post.title)}</h3>
                         <p>{contentOrEmpty(post.excerpt)}</p>
-                        {post.body && <details><summary>Read note</summary><p>{post.body}</p></details>}
+                        {post.body && (
+                          <details>
+                            <summary>Read note</summary>
+                            <p>{post.body}</p>
+                          </details>
+                        )}
                       </div>
                     </article>
                   ))}
@@ -1041,12 +1080,13 @@ export default function App() {
                 <p>{contentOrEmpty(settings.aboutExperience)}</p>
               </div>
               <div className="credits">
-                {settings.skills.filter((skill) => skill.trim()).length === 0 && (
-                  <span className="empty-content">No content yet.</span>
-                )}
-                {settings.skills.filter((skill) => skill.trim()).map((skill) => (
-                  <span key={skill}>{skill}</span>
-                ))}
+                {settings.skills.filter((skill) => skill.trim()).length ===
+                  0 && <span className="empty-content">No content yet.</span>}
+                {settings.skills
+                  .filter((skill) => skill.trim())
+                  .map((skill) => (
+                    <span key={skill}>{skill}</span>
+                  ))}
               </div>
             </div>
           )}
@@ -1143,12 +1183,16 @@ export default function App() {
                 <p className="empty-content">No content yet.</p>
               )}
               <div className="socials">
-                {settings.socials.every((social) => !social.label.trim() || !social.url.trim()) && (
-                  <p className="empty-content">No content yet.</p>
-                )}
-                {settings.socials.filter((social) => social.label.trim() && social.url.trim()).map((social) => (
-                  <a key={social.label} href={social.url}>{social.label}</a>
-                ))}
+                {settings.socials.every(
+                  (social) => !social.label.trim() || !social.url.trim(),
+                ) && <p className="empty-content">No content yet.</p>}
+                {settings.socials
+                  .filter((social) => social.label.trim() && social.url.trim())
+                  .map((social) => (
+                    <a key={social.label} href={social.url}>
+                      {social.label}
+                    </a>
+                  ))}
               </div>
             </div>
           )}
