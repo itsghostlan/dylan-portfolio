@@ -21,6 +21,7 @@ import {
   UserRound,
   X,
 } from "lucide-react"
+import { Analytics } from "@vercel/analytics/react"
 
 type PageId = "home" | "about" | "projects" | "work" | "contact"
 
@@ -596,6 +597,7 @@ function ProjectDetailPage({
         </div>
       </footer>
       <ScrollProgressButton />
+      <Analytics />
     </main>
   )
 }
@@ -1199,6 +1201,7 @@ export default function App() {
         </div>
       </footer>
       <ScrollProgressButton />
+      <Analytics />
     </main>
   )
 }
