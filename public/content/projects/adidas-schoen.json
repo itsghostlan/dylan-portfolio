@@ -1,0 +1,24 @@
+{
+  "title": "Adidas",
+  "type": "School Project",
+  "year": "2025",
+  "role": "Creative director",
+  "client": "Talland College",
+  "featured": false,
+  "images": [
+    "/images/uploads/Mock up adidas.jpg",
+    "/images/uploads/ontwerp sneaker concept board.jpg",
+    "/images/uploads/tijdlijn van adidas.jpg",
+    "/images/uploads/schoen.jpg"
+  ],
+  "tags": [
+    "Design",
+    "Fashion",
+    "Promotion/Advertising"
+  ],
+  "deliverables": [
+    "Conceptboard",
+    "Design Mock-ups",
+    "Poster"
+  ]
+}
