@@ -1,0 +1,20 @@
+{
+  "title": "Koffie Van Sander",
+  "type": "School project",
+  "year": "2026",
+  "role": "Creative director",
+  "client": "Talland College",
+  "featured": false,
+  "images": [
+    "/images/uploads/Koffie Van Sander logo's.jpg",
+    "/images/uploads/Online abri coffie van sander copy.jpg",
+    "/images/uploads/reclame-mock-up.jpg"
+  ],
+  "tags": [
+    "Design",
+    "Promotion/Advertising"
+  ],
+  "deliverables": [
+    "Design mock up"
+  ]
+}
