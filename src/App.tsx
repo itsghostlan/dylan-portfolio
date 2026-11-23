@@ -327,9 +327,12 @@ function Vinyl({
         <div className="grooves" />
         <div className="vinyl-shine" />
         <div className="label">
-          <span>PORTFOLIO</span>
-          <strong>itsghostlan</strong>
-          <span>PLAY LOUD</span>
+          <img
+            className="vinyl-logo"
+            src="/images/uploads/main-logo.svg"
+            alt=""
+            aria-hidden="true"
+          />
         </div>
         <div className="spindle" />
       </div>
