@@ -351,6 +351,7 @@ function Vinyl({
 function ScrollProgressButton() {
   const [progress, setProgress] = useState(0)
   const [isVisible, setIsVisible] = useState(false)
+  const [bottomOffset, setBottomOffset] = useState(18)
 
   useEffect(() => {
     const updateProgress = () => {
@@ -358,8 +359,24 @@ function ScrollProgressButton() {
         document.documentElement.scrollHeight - window.innerHeight
       const nextProgress =
         scrollableHeight > 0 ? (window.scrollY / scrollableHeight) * 100 : 0
+      const footer = document.querySelector("footer")
+      const footerTop = footer?.getBoundingClientRect().top
+      const footerIsEnteringViewport =
+        typeof footerTop === "number" &&
+        footerTop < window.innerHeight &&
+        footerTop > 62
+      const nextBottomOffset =
+        footerIsEnteringViewport
+          ? Math.max(18, window.innerHeight - footerTop + 18)
+          : 18
       setProgress(Math.max(0, Math.min(100, nextProgress)))
-      setIsVisible(window.scrollY > 180)
+      setIsVisible(
+        window.scrollY > 180 &&
+          (typeof footerTop !== "number" ||
+            footerTop > 62 ||
+            footerTop >= window.innerHeight),
+      )
+      setBottomOffset(nextBottomOffset)
     }
 
     updateProgress()
@@ -374,6 +391,7 @@ function ScrollProgressButton() {
   return (
     <button
       className={`scroll-progress ${isVisible ? "is-visible" : ""}`}
+      style={{ bottom: `${bottomOffset}px` }}
       onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
       aria-label={`Back to top, ${Math.round(progress)}% down the page`}
     >
