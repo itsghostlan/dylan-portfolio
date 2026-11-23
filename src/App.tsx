@@ -101,7 +101,7 @@ const defaultSettings: SiteSettings = {
     "Previously at Studio North. Currently collaborating with founders, artists, and teams who care about making things with a point of view.",
   skills: ["Strategy", "Art direction", "Digital design", "Identity"],
   contactHeading: "Let’s make something worth replaying.",
-  email: "hello@norareyes.design",
+  email: "",
   socials: [
     { label: "Instagram", url: "#instagram" },
     { label: "LinkedIn", url: "#linkedin" },

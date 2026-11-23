@@ -317,6 +317,16 @@ footer {
   font-size: clamp(5px, 0.55vw, 8px);
   letter-spacing: 0.1em;
   text-align: center;
+  animation: label-spin 30s linear infinite;
+}
+
+@keyframes label-spin {
+  from {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
 }
 
 .label strong {
