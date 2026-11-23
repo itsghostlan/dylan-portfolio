@@ -626,6 +626,11 @@ export default function App() {
   const displayedPage = pages[displayedPageIndex].id
 
   useEffect(() => {
+    document.documentElement.classList.toggle("home-page-active", isHome)
+    return () => document.documentElement.classList.remove("home-page-active")
+  }, [isHome])
+
+  useEffect(() => {
     let cancelled = false
     const loadJson = async (path: string): Promise<unknown> => {
       const response = await fetch(`${import.meta.env.BASE_URL}content/${path}`)
