@@ -765,33 +765,44 @@ export default function App() {
       existingFavicon?.remove()
     }
 
-    const syncHash = () => {
-      const hash = window.location.hash.slice(1)
-      if (hash.startsWith("project-")) {
-        const project = projects.find((item) => item.slug === hash.slice(8))
+    const syncPath = () => {
+      const pathParts = window.location.pathname
+        .replace(/^\/+|\/+$/g, "")
+        .split("/")
+        .filter(Boolean)
+
+      if (pathParts[0] === "projects" && pathParts[1]) {
+        const project = projects.find((item) => item.slug === pathParts[1])
         if (project) {
           setPage("projects")
           setSelectedProject(project)
+          return
         }
+      }
+
+      if (pathParts.length === 0) {
+        setPage("home")
+        setSelectedProject(null)
         return
       }
-      const pageFromHash = hash as PageId
-      if (pages.some((item) => item.id === pageFromHash)) {
-        setPage(pageFromHash)
+
+      const pageFromPath = pathParts[0] as PageId
+      if (pages.some((item) => item.id === pageFromPath)) {
+        setPage(pageFromPath)
         setSelectedProject(null)
       }
     }
 
-    syncHash()
-    window.addEventListener("hashchange", syncHash)
-    return () => window.removeEventListener("hashchange", syncHash)
+    syncPath()
+    window.addEventListener("popstate", syncPath)
+    return () => window.removeEventListener("popstate", syncPath)
   }, [projects, settings.siteTitle, settings.favicon])
 
   const navigate = (nextPage: PageId) => {
     if (nextPage === page) {
       if (selectedProject) {
         setSelectedProject(null)
-        window.history.pushState(null, "", `#${nextPage}`)
+        window.history.pushState(null, "", `/${nextPage}`)
       }
       window.scrollTo({ top: 0, behavior: "smooth" })
       return
@@ -799,20 +810,20 @@ export default function App() {
     setSpin((value) => value + 1)
     setPage(nextPage)
     setSelectedProject(null)
-    window.history.replaceState(null, "", `#${nextPage}`)
+    window.history.pushState(null, "", nextPage === "home" ? "/" : `/${nextPage}`)
     window.scrollTo({ top: 0, behavior: "smooth" })
   }
 
   const openProject = (project: Project) => {
     setPage("projects")
     setSelectedProject(project)
-    window.history.pushState(null, "", `#project-${project.slug}`)
+    window.history.pushState(null, "", `/projects/${project.slug}`)
     window.scrollTo({ top: 0, behavior: "smooth" })
   }
 
   const closeProject = () => {
     setSelectedProject(null)
-    window.history.pushState(null, "", "#projects")
+    window.history.pushState(null, "", "/projects")
     window.setTimeout(() => {
       document
         .getElementById("page-content")
@@ -972,7 +983,16 @@ export default function App() {
           ))}
         </nav>
 
-        <a className="scroll-cue" href="#page-content">
+        <a
+          className="scroll-cue"
+          href="/"
+          onClick={(event) => {
+            event.preventDefault()
+            document
+              .getElementById("page-content")
+              ?.scrollIntoView({ behavior: "smooth" })
+          }}
+        >
           Scroll for page content
           <span aria-hidden="true">↓</span>
         </a>
