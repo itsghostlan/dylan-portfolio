@@ -57,6 +57,7 @@ collections:
       - { label: Year, name: year, widget: string, required: false }
       - { label: Role, name: role, widget: string, required: false }
       - { label: Client, name: client, widget: string, required: false }
+      - { label: Description, name: description, widget: markdown, required: false }
       - { label: Featured on Home, name: featured, widget: boolean, default: false, required: false }
       - label: Images
         name: images
@@ -85,6 +86,7 @@ collections:
     fields:
       - { label: Display Title, name: title, widget: string, required: false }
       - { label: Year, name: year, widget: string, required: false }
+      - { label: Description, name: description, widget: markdown, required: false }
       - label: Media
         name: media
         widget: list

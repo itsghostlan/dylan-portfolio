@@ -22,6 +22,8 @@ import {
   X,
 } from "lucide-react"
 import { Analytics } from "@vercel/analytics/react"
+import DOMPurify from "dompurify"
+import { marked } from "marked"
 
 type PageId = "home" | "about" | "projects" | "work" | "contact"
 
@@ -45,6 +47,7 @@ type Project = {
   client?: string
   tags?: string[]
   deliverables?: string[]
+  description?: string
 }
 
 type WorkItem = {
@@ -53,6 +56,7 @@ type WorkItem = {
   year: string
   media: string[]
   order?: number | null
+  description?: string
 }
 
 type SiteSettings = {
@@ -147,6 +151,24 @@ function asString(value: unknown): string {
   return typeof value === "string" ? value : ""
 }
 
+function Markdown({
+  text,
+  className = "markdown-content",
+}: {
+  text: string
+  className?: string
+}) {
+  if (!text.trim()) return null
+  const html = marked.parse(text, { async: false }) as string
+  const sanitizedHtml = DOMPurify.sanitize(html)
+  return (
+    <div
+      className={className}
+      dangerouslySetInnerHTML={{ __html: sanitizedHtml }}
+    />
+  )
+}
+
 function parseSiteSettings(value: unknown): SiteSettings | null {
   if (!isRecord(value)) return null
   const skills = Array.isArray(value.skills) ? value.skills : []
@@ -194,6 +216,7 @@ function parseProject(value: unknown): Project | null {
     deliverables: deliverables.filter(
       (deliverable): deliverable is string => typeof deliverable === "string",
     ),
+    description: asString(value.description),
   }
 }
 
@@ -205,6 +228,7 @@ function parseWorkItem(value: unknown): WorkItem | null {
     title: asString(value.title),
     year: asString(value.year),
     media: media.filter((file): file is string => typeof file === "string"),
+    description: asString(value.description),
     order:
       typeof value.order === "number" || value.order === null
         ? value.order
@@ -509,6 +533,12 @@ function ProjectDetailPage({
             </span>
           </div>
         </section>
+
+        {project.description?.trim() && (
+          <section className="project-description" aria-label="Project description">
+            <Markdown text={project.description} />
+          </section>
+        )}
 
         <div className="project-page-footer">
           <div>
@@ -1154,6 +1184,12 @@ export default function App() {
                       <strong>{contentOrEmpty(item.title)}</strong>
                       <span>{contentOrEmpty(item.year)}</span>
                     </div>
+                    {item.description?.trim() && (
+                      <Markdown
+                        text={item.description}
+                        className="work-description markdown-content"
+                      />
+                    )}
                   </article>
                 ))}
               </div>
